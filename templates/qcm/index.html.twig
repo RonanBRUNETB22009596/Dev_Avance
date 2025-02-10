@@ -1,20 +1,52 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QCM Page</title>
+    <style>
+        .flag-item {
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+        .flag-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<h1>Select a Flag</h1>
+<ul id="flags-list"></ul>
 
-{% block title %}Hello QcmController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/Dev_Avance/src/Controller/QcmController.php</code></li>
-        <li>Your template at <code>D:/Dev_Avance/templates/qcm/index.html.twig</code></li>
-    </ul>
+<h2>Selected Flag</h2>
+<div id="selected-flag">
+    <p>No flag selected yet.</p>
 </div>
-{% endblock %}
+
+<script>
+    // Fetch flags data from the API
+    fetch('http://127.0.0.1:8000/api/flags')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('flags-list');
+            data.forEach(flag => {
+                const li = document.createElement('li');
+                li.classList.add('flag-item');
+                li.textContent = `${flag.name}: ${flag.flag}`;
+
+                // Add click event to each flag item
+                li.addEventListener('click', function() {
+                    // Show the selected flag
+                    document.getElementById('selected-flag').innerHTML = `
+                            <p>You selected: ${flag.name} ${flag.flag}</p>
+                        `;
+                });
+
+                list.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Error fetching flags:', error));
+</script>
+</body>
+</html>
