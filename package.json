@@ -1,0 +1,23 @@
+{
+    "name": "dev_avance",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "dev": "your-dev-command-here"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/RonanBRUNETB22009596/Dev_Avance.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/RonanBRUNETB22009596/Dev_Avance/issues"
+    },
+    "homepage": "https://github.com/RonanBRUNETB22009596/Dev_Avance#readme",
+    "description": "",
+    "devDependencies": {
+        "bootstrap": "^5.3.3"
+    }
+}
