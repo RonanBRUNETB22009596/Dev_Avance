@@ -1,0 +1,29 @@
+{# templates/quiz/capital_quiz.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Capital Quiz{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center">Capital Quiz</h1>
+        <form method="POST">
+            {% for question in questions %}
+                <div class="mb-3">
+                    <h4>{{ question.country }}</h4>
+                    <div>
+                        {% for option in question.options %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ loop.index }}" id="question_{{ loop.index }}_{{ loop.index0 }}" value="{{ option }}" required>
+                                <label class="form-check-label" for="question_{{ loop.index }}_{{ loop.index0 }}">
+                                    {{ option }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}

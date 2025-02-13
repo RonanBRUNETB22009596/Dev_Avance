@@ -1,46 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QCM Page</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         .flag-item {
             cursor: pointer;
             padding: 10px;
-            margin: 5px;
             border: 1px solid #ddd;
-            display: inline-block;
+            display: block;
+            transition: background-color 0.3s ease;
         }
         .flag-item:hover {
-            background-color: #f0f0f0;
+            background-color: #f8f9fa;
+        }
+        #selected-flag p {
+            font-weight: bold;
+            font-size: 18px;
         }
     </style>
 </head>
-<body>
-<h1>Select a Flag</h1>
-<ul id="flags-list"></ul>
+<body class="bg-light">
 
-<h2>Selected Flag</h2>
-<div id="selected-flag">
-    <p>No flag selected yet.</p>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="mb-4">Select a Flag</h1>
+
+            <!-- Logout Button -->
+            <form action="{{ path('app_logout') }}" method="post">
+                <button type="submit" class="btn btn-danger mb-4">Log Out</button>
+            </form>
+
+            <h2 class="mb-3">Flags List</h2>
+            <ul id="flags-list" class="list-group mb-4"></ul>
+
+            <h2 class="mb-3">Selected Flag</h2>
+            <div id="selected-flag" class="alert alert-secondary">
+                <p>No flag selected yet.</p>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Bootstrap JS (Optional, for some interactive features) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // Fetch flags data from the API
     fetch('http://127.0.0.1:8000/api/flags')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('flags-list');
             data.forEach(flag => {
                 const li = document.createElement('li');
-                li.classList.add('flag-item');
+                li.classList.add('list-group-item', 'flag-item');
                 li.textContent = `${flag.name}: ${flag.flag}`;
 
-                // Add click event to each flag item
                 li.addEventListener('click', function() {
-                    // Show the selected flag
                     document.getElementById('selected-flag').innerHTML = `
-                            <p>You selected: ${flag.name} ${flag.flag}</p>
-                        `;
+                        <p class="mb-0">You selected: <strong>${flag.name}</strong> ${flag.flag}</p>
+                    `;
                 });
 
                 list.appendChild(li);
@@ -48,5 +72,6 @@
         })
         .catch(error => console.error('Error fetching flags:', error));
 </script>
+
 </body>
 </html>

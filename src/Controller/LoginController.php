@@ -21,9 +21,10 @@ class LoginController extends AbstractController
         ]);
     }
 
-    #[Route('/logout', name: 'app_logout', methods: ['GET'])]
+    #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
+        // This method will be intercepted by Symfony's security system.
         throw new \Exception('This should never be reached!');
     }
 }

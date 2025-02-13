@@ -1,0 +1,27 @@
+{# templates/capital_quiz_result.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Quiz Results{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="text-center text-success">Quiz Completed!</h2>
+
+                <p class="lead text-center">
+                    You answered <strong>{{ score }}</strong> out of <strong>{{ total_questions }}</strong> questions correctly.
+                </p>
+
+                <div class="text-center">
+                    <p>Your score: <strong>{{ percentage|round(2) }}%</strong></p>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <a href="{{ path('capital_quiz') }}" class="btn btn-primary btn-lg">Try Again</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
