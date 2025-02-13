@@ -3,74 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QCM Page</title>
+    <title>European Capitals Quiz</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        .flag-item {
-            cursor: pointer;
-            padding: 10px;
-            border: 1px solid #ddd;
-            display: block;
-            transition: background-color 0.3s ease;
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
         }
-        .flag-item:hover {
-            background-color: #f8f9fa;
-        }
-        #selected-flag p {
-            font-weight: bold;
-            font-size: 18px;
+        .btn-option {
+            width: 100%;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body class="bg-light">
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2 text-center">
-            <h1 class="mb-4">Select a Flag</h1>
+<div class="container mt-5 quiz-container">
+    <h1 class="text-center mb-4">European Capitals Quiz</h1>
 
-            <!-- Logout Button -->
-            <form action="{{ path('app_logout') }}" method="post">
-                <button type="submit" class="btn btn-danger mb-4">Log Out</button>
-            </form>
-
-            <h2 class="mb-3">Flags List</h2>
-            <ul id="flags-list" class="list-group mb-4"></ul>
-
-            <h2 class="mb-3">Selected Flag</h2>
-            <div id="selected-flag" class="alert alert-secondary">
-                <p>No flag selected yet.</p>
-            </div>
-        </div>
+    <!-- Country Selection -->
+    <div id="country-selection" class="card p-4 shadow">
+        <h4>Select Your Country:</h4>
+        <button class="btn btn-outline-primary btn-option" onclick="startQuiz('france')">🇫🇷 France</button>
+        <button class="btn btn-outline-secondary btn-option" onclick="startQuiz('us')">🇺🇸 US</button>
+        <button class="btn btn-outline-warning btn-option" onclick="startQuiz('canada')">🇨🇦 Canada</button>
     </div>
+
+    <!-- Quiz Section (Hidden initially) -->
+    <div id="quiz-section" class="card p-4 shadow d-none">
+        <h4 id="question">Loading question...</h4>
+        <div id="options" class="mt-3"></div>
+
+        <p id="feedback" class="mt-3 fw-bold"></p>
+        <p id="score" class="fw-bold">Score: 0</p>
+
+        <button id="next-btn" class="btn btn-primary mt-3" style="display: none;">Next Question</button>
+        <button id="restart-btn" class="btn btn-danger mt-4 d-none">Restart Quiz</button>
+    </div>
+
+    <!-- Logout Button -->
+    <form action="{{ path('app_logout') }}" method="post" class="text-center mt-3">
+        <button type="submit" class="btn btn-dark">Log Out</button>
+    </form>
 </div>
 
-<!-- Bootstrap JS (Optional, for some interactive features) -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    fetch('http://127.0.0.1:8000/api/flags')
-        .then(response => response.json())
-        .then(data => {
-            const list = document.getElementById('flags-list');
-            data.forEach(flag => {
-                const li = document.createElement('li');
-                li.classList.add('list-group-item', 'flag-item');
-                li.textContent = `${flag.name}: ${flag.flag}`;
+    const quizData = {
+        france: [
+            { question: "What is the capital of France?", correct: "Paris", options: ["Paris", "Berlin", "Madrid", "Rome"] },
+            { question: "What is the capital of Germany?", correct: "Berlin", options: ["Vienna", "Berlin", "Amsterdam", "Lisbon"] },
+            { question: "What is the capital of Spain?", correct: "Madrid", options: ["Madrid", "Barcelona", "Lisbon", "Athens"] },
+            { question: "What is the capital of Italy?", correct: "Rome", options: ["Naples", "Rome", "Milan", "Venice"] },
+            { question: "What is the capital of Belgium?", correct: "Brussels", options: ["Brussels", "Zurich", "Copenhagen", "Oslo"] }
+        ],
+        us: [],
+        canada: []
+    };
 
-                li.addEventListener('click', function() {
-                    document.getElementById('selected-flag').innerHTML = `
-                        <p class="mb-0">You selected: <strong>${flag.name}</strong> ${flag.flag}</p>
-                    `;
-                });
+    let currentCountry = "";
+    let currentQuestionIndex = 0;
+    let score = 0;
 
-                list.appendChild(li);
-            });
-        })
-        .catch(error => console.error('Error fetching flags:', error));
+    const countrySelection = document.getElementById("country-selection");
+    const quizSection = document.getElementById("quiz-section");
+    const questionElement = document.getElementById("question");
+    const optionsElement = document.getElementById("options");
+    const feedbackElement = document.getElementById("feedback");
+    const scoreElement = document.getElementById("score");
+    const nextButton = document.getElementById("next-btn");
+    const restartButton = document.getElementById("restart-btn");
+
+    function startQuiz(country) {
+        currentCountry = country;
+        if (quizData[country].length === 0) {
+            alert(`Sorry, no quiz available for ${country.toUpperCase()} yet.`);
+            return;
+        }
+
+        countrySelection.classList.add("d-none");
+        quizSection.classList.remove("d-none");
+
+        currentQuestionIndex = 0;
+        score = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const currentQuestion = quizData[currentCountry][currentQuestionIndex];
+        questionElement.textContent = currentQuestion.question;
+        optionsElement.innerHTML = "";
+
+        currentQuestion.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.classList.add("btn", "btn-outline-primary", "btn-option");
+            btn.textContent = option;
+            btn.addEventListener("click", () => checkAnswer(option, currentQuestion.correct));
+            optionsElement.appendChild(btn);
+        });
+
+        feedbackElement.textContent = "";
+        nextButton.style.display = "none";
+    }
+
+    function checkAnswer(selected, correct) {
+        if (selected === correct) {
+            feedbackElement.textContent = "✅ Correct!";
+            feedbackElement.classList.add("text-success");
+            score++;
+        } else {
+            feedbackElement.textContent = `❌ Wrong! The correct answer is ${correct}.`;
+            feedbackElement.classList.add("text-danger");
+        }
+
+        scoreElement.textContent = `Score: ${score}`;
+        nextButton.style.display = "block";
+    }
+
+    nextButton.addEventListener("click", () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData[currentCountry].length) {
+            loadQuestion();
+        } else {
+            endQuiz();
+        }
+    });
+
+    function endQuiz() {
+        questionElement.textContent = "Quiz Finished!";
+        optionsElement.innerHTML = "";
+        feedbackElement.textContent = `Final Score: ${score}/${quizData[currentCountry].length}`;
+        nextButton.style.display = "none";
+        restartButton.classList.remove("d-none");
+    }
+
+    restartButton.addEventListener("click", () => {
+        countrySelection.classList.remove("d-none");
+        quizSection.classList.add("d-none");
+    });
 </script>
 
 </body>
